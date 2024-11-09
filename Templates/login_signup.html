@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      /* Inherit background animation and font styling */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Roboto", sans-serif;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #111826, #283c56);
+        background-size: 200% 200%;
+        animation: gradientAnimation 10s ease infinite;
+      }
+      @keyframes gradientAnimation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Container styling */
+      .container {
+        width: 90%;
+        max-width: 500px;
+        background: #1b2136;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        color: #cdd4e7;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 1.8em;
+        color: #80d4ff;
+        margin-bottom: 20px;
+      }
+
+      /* Form styling */
+      .form-group {
+        margin-bottom: 15px;
+        text-align: left;
+      }
+      label {
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #a3b1c9;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background-color: #1c2738;
+        color: #cdd4e7;
+        transition: background-color 0.3s;
+      }
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="password"]:focus {
+        background-color: #25374b;
+        outline: none;
+      }
+
+      /* Button styling */
+      button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background-color: #80d4ff;
+        color: #0e1626;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: box-shadow 0.3s, transform 0.3s;
+        box-shadow: 0 4px 15px rgba(128, 212, 255, 0.4);
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(128, 212, 255, 0.6);
+      }
+
+      .toggle-link {
+        display: inline-block;
+        margin-top: 15px;
+        color: #80d4ff;
+        cursor: pointer;
+        transition: color 0.3s;
+      }
+      .toggle-link:hover {
+        color: #b0e0ff;
+      }
+    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login / Sign-Up</title>
+  </head>
+  <body>
+    <div class="container" id="authContainer">
+      <h1 id="authTitle">Login</h1>
+
+      <form id="loginForm">
+        <!-- Login form -->
+        <div class="form-group">
+          <label for="loginEmail">Email:</label>
+          <input type="email" id="loginEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password:</label>
+          <input type="password" id="loginPassword" required />
+        </div>
+        <button type="button" onclick="login()">Login</button>
+        <p class="toggle-link" onclick="toggleAuthForm()">
+          Don't have an account? Sign Up
+        </p>
+      </form>
+
+      <form id="signupForm" style="display: none">
+        <!-- Sign-Up form -->
+        <div class="form-group">
+          <label for="signupName">Name:</label>
+          <input type="text" id="signupName" required />
+        </div>
+        <div class="form-group">
+          <label for="signupEmail">Email:</label>
+          <input type="email" id="signupEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Password:</label>
+          <input type="password" id="signupPassword" required />
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password:</label>
+          <input type="password" id="confirmPassword" required />
+        </div>
+        <button type="button" onclick="signUp()">Sign Up</button>
+        <p class="toggle-link" onclick="toggleAuthForm()">
+          Already have an account? Login
+        </p>
+      </form>
+    </div>
+
+    <script>
+      function toggleAuthForm() {
+        const loginForm = document.getElementById("loginForm");
+        const signupForm = document.getElementById("signupForm");
+        const authTitle = document.getElementById("authTitle");
+
+        if (loginForm.style.display === "none") {
+          loginForm.style.display = "block";
+          signupForm.style.display = "none";
+          authTitle.textContent = "Login";
+        } else {
+          loginForm.style.display = "none";
+          signupForm.style.display = "block";
+          authTitle.textContent = "Sign-Up";
+        }
+      }
+
+      function login() {
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        // Basic validation check
+        if (email === "" || password === "") {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        // Perform login request
+        fetch("/login_signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ type: "login", email, password }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              window.location.href = "/main"; // Redirect to main page
+            } else {
+              alert(data.error);
+            }
+          });
+      }
+
+      function signUp() {
+        const name = document.getElementById("signupName").value;
+        const email = document.getElementById("signupEmail").value;
+        const password = document.getElementById("signupPassword").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        // Basic validation check
+        if (
+          name === "" ||
+          email === "" ||
+          password === "" ||
+          confirmPassword === ""
+        ) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          alert("Passwords do not match.");
+          return;
+        }
+
+        // Perform sign-up request
+        fetch("/login_signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ type: "signup", name, email, password }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Sign-Up successful! You can now log in.");
+              toggleAuthForm(); // Switch to login form
+            } else {
+              alert(data.error);
+            }
+          });
+      }
+    </script>
+  </body>
+</html>

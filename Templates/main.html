@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <style>
+      /* Reset and general styling */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Roboto", sans-serif;
+      }
+
+      /* Background with subtle animated gradient */
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #111826, #283c56);
+        background-size: 200% 200%;
+        animation: gradientAnimation 10s ease infinite;
+      }
+      @keyframes gradientAnimation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Container styling */
+      .container {
+        width: 90%;
+        max-width: 700px;
+        background: #1b2136;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        color: #cdd4e7;
+        transition: transform 0.3s ease;
+      }
+      .container:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Title Styling */
+      h1 {
+        font-size: 1.8em;
+        text-align: center;
+        color: #80d4ff;
+        margin-bottom: 20px;
+      }
+
+      /* Form Styling */
+      .search-form {
+        padding: 20px;
+        border-radius: 10px;
+        background: #273048;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+      }
+
+      /* Label and input styling */
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #a3b1c9;
+      }
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background-color: #1c2738;
+        color: #cdd4e7;
+        transition: background-color 0.3s;
+      }
+      input[type="text"]:focus,
+      select:focus {
+        background-color: #25374b;
+        outline: none;
+      }
+
+      /* Button styling with neon effect */
+      button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background-color: #80d4ff;
+        color: #0e1626;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: box-shadow 0.3s, transform 0.3s;
+        box-shadow: 0 4px 15px rgba(128, 212, 255, 0.4);
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(128, 212, 255, 0.6);
+      }
+
+      /* Results styling */
+      .results {
+        background: #1b2136;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+      .query-result {
+        margin-bottom: 12px;
+        padding: 12px;
+        border: 1px solid #3c4a5f;
+        border-radius: 8px;
+        background-color: #273048;
+        color: #cdd4e7;
+      }
+      .query-result h3 {
+        margin-bottom: 5px;
+        color: #80d4ff;
+      }
+      .query-result pre {
+        background: #1c2738;
+        padding: 10px;
+        border-radius: 6px;
+        color: #cdd4e7;
+        font-size: 0.9em;
+      }
+    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medical Search Query Generator</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome, {{ user }}</h1>
+      <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+      <h1>Healthcare Data Search</h1>
+      <div class="search-form">
+        <form onsubmit="generateQuery(event)">
+          <div class="form-group">
+            <label for="symptoms">Symptoms:</label>
+            <select id="symptoms" required name="symptoms">
+              <option value="">Select Symptom</option>
+              <option value="fever">Fever</option>
+              <option value="headache">Headache</option>
+              <option value="cough">Cough</option>
+              <option value="shortness_of_breath">Shortness of breath</option>
+              <option value="chest_pain">Chest pain</option>
+              <option value="fatigue">Fatigue</option>
+              <option value="nausea">Nausea</option>
+              <option value="joint_pain">Joint pain</option>
+              <option value="dizziness">Dizziness</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="diagnosis">Diagnosis:</label>
+            <select id="diagnosis" required name="diagnosis">
+              <option value="">Select Diagnosis</option>
+              <option value="flu">Flu</option>
+              <option value="migraine">Migraine</option>
+              <option value="bronchitis">Bronchitis</option>
+              <option value="asthma">Asthma</option>
+              <option value="heart_disease">Heart Disease</option>
+              <option value="anemia">Anemia</option>
+              <option value="food_poisoning">Food Poisoning</option>
+              <option value="arthritis">Arthritis</option>
+              <option value="vertigo">Vertigo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Lab Results</label>
+            <div class="checkbox-group" id="lab_results">
+              <label>
+                <input type="checkbox" value="normal" /> Normal
+              </label>
+              <label>
+                <input type="checkbox" value="elevated_wbc" /> Elevated WBC
+              </label>
+              <label>
+                <input type="checkbox" value="elevated_cholesterol" /> Elevated Cholesterol
+              </label>
+              <label>
+                <input type="checkbox" value="low_hemoglobin" /> Low Hemoglobin
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="age">Age Range:</label>
+            <select id="age" name="age">
+              <option value="">Any Age</option>
+              <option value="20-35">20-35</option>
+              <option value="36-50">36-50</option>
+              <option value="51-65">51-65</option>
+              <option value="66+">66+</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender">
+              <option value="">Any Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
+          <button type="submit">Search Patient Records</button>
+        </form>
+      </div>
+
+      <div class="results" id="queryResults">
+        <h2>Search Results</h2>
+        <div id="queries"></div>
+      </div>
+    </div>
+
+    <script>
+      function generateQuery(event) {
+        event.preventDefault();
+        const symptoms = document.getElementById("symptoms").value;
+        const diagnosis = document.getElementById("diagnosis").value;
+        const age = document.getElementById("age").value;
+        const gender = document.getElementById("gender").value;
+
+        // Get selected lab results
+        const labResults = Array.from(document.querySelectorAll("#lab_results input:checked")).map((cb) => cb.value);
+
+        const data = {
+          symptoms: symptoms,
+          diagnosis: diagnosis,
+          age: age,
+          gender: gender,
+          lab_results: labResults
+        };
+
+        // Simulated fetch - replace with actual endpoint
+        fetch("/search-records", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+        .then(response => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+      })
+      .then(results => {
+        displayResults(results);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("queries").innerHTML = '<p style="color: red;">An error occurred. Please try again.</p>';
+      });
+      }
+
+      function displayResults(results) {
+        const queriesDiv = document.getElementById("queries");
+        queriesDiv.innerHTML = "";
+
+        results.forEach(result => {
+          const resultElement = document.createElement("div");
+          resultElement.className = "query-result";
+          resultElement.innerHTML = `
+            <h3>Patient ID: ${result.Patient_ID}</h3>
+            <pre>
+Age: ${result.Age}
+Gender: ${result.Gender}
+Symptom: ${result.Symptom}
+Diagnosis: ${result.Diagnosis}
+Treatment: ${result.Treatment}
+Outcome: ${result.Outcome}
+Lab Results: ${result.Lab_Results}
+            </pre>
+          `;
+          queriesDiv.appendChild(resultElement);
+        });
+      }
+    </script>
+  </body>
+</html>
